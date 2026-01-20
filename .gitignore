@@ -5,3 +5,4 @@ dist
 logs
 backend/logs
 npm-debug.log
+# End of gitignore
