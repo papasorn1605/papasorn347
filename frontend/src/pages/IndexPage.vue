@@ -37,12 +37,34 @@
       </q-card-section>
     </q-card>
 
-
+    <!-- New: API Data from Backend -->
+    <q-card>
+      <q-card-section>
+        <div class="text-h6">Data from Backend API</div>
+        <q-spinner v-if="loading" color="primary" size="2em" />
+        <q-list v-else bordered separator class="q-mt-sm">
+          <q-item>
+            <q-item-section>
+              <q-item-label>Advanced Git</q-item-label>
+              <q-item-label caption>{{ apiData.git?.detail }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item>
+            <q-item-section>
+              <q-item-label>Advanced Docker</q-item-label>
+              <q-item-label caption>{{ apiData.docker?.detail }}</q-item-label>
+            </q-item-section>
+          </q-item>
+        </q-list>
+        <q-btn v-if="!loading" color="primary" @click="fetchData" class="q-mt-md">Refresh Data</q-btn>
+      </q-card-section>
+    </q-card>
   </q-page>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 
 const gitSteps = ref([
   { title: 'Clone Repo', detail: 'git clone <url>' },
@@ -57,4 +79,23 @@ const dockerItems = ref([
   { title: 'Volumes', detail: 'Persist data outside container' },
   { title: 'Networks', detail: 'Communication between containers' }
 ])
+
+const apiData = ref({})
+const loading = ref(false)
+
+const fetchData = async () => {
+  loading.value = true
+  try {
+    const response = await axios.get(import.meta.env.VITE_API_URL + '/api/demo')
+    apiData.value = response.data
+  } catch (error) {
+    console.error('Error fetching data:', error)
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchData()
+})
 </script>
